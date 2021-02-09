@@ -32,10 +32,11 @@ vector<string> Balde::getPseudoChave()
 
 bool Balde::addKey(string chave)
 {
-    if(pseudoChave.size() < this->sizeBalde)
+    if(this->pseudoChave.size() < this->sizeBalde)
     {
         this->pseudoChave.push_back(chave);
         return true;
     }
+    addProfLocal();
     return false;
 }

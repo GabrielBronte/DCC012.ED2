@@ -9,7 +9,8 @@ class Diretorio
     private:
     int profGlobal;
     int sizeBalde;
-    vector<Balde> registros;
+    int numBits;
+    vector<Balde*> registros;
 
 
     public:
@@ -20,7 +21,7 @@ class Diretorio
 
     void addProfGlobal();
 
-    vector<Balde>getRegistros();
+    vector<Balde*>getRegistros();
 
 
     int identificaBits(string chave);

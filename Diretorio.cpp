@@ -10,16 +10,18 @@ using namespace std;
 
 Diretorio::Diretorio(int numBits, int sizeBalde)
 {
-    this->profGlobal = numBits;
+    this->profGlobal = 1;
+    this->numBits = numBits;
     this->sizeBalde = sizeBalde;
 
     Balde *ind = new Balde(sizeBalde,0);
 
-    for( int i=0 ; i < pow(2,numBits) ; i++)
+    for( int i=0 ; i < 2 ; i++)
     {
-        this->registros.push_back(*ind);
+        this->registros.push_back(ind);
     }
-}
+
+} 
 
 Diretorio::~Diretorio()
 {}
@@ -29,7 +31,7 @@ void Diretorio::addProfGlobal()
     this->profGlobal++;
 }
 
-vector<Balde>Diretorio::getRegistros(){
+vector<Balde*>Diretorio::getRegistros(){
     return this->registros;
 }
 
@@ -38,7 +40,8 @@ int Diretorio::identificaBits(string chave)
     vector<char> indiceDiretorio;
     int indice = 0;
     int j = 0;
-    for(int i=0; i < this->profGlobal ; i++)
+
+    for(int i=0; i < this->numBits ; i++)
     {
         indiceDiretorio.push_back(chave[i]);
     }
@@ -68,9 +71,10 @@ bool Diretorio::search(int k)
 {
     string chave = Hashing(k);
     int indice = identificaBits(chave);
-    for(int i=0; i < registros[indice].getPseudoChave().size() ; i++)
+
+    for(int i=0; i < registros[indice]->getPseudoChave().size() ; i++)
     {
-        if(chave == registros[indice].getPseudoChave()[i])
+        if(chave == registros[indice]->getPseudoChave()[i])
         {
             return true;
         }
@@ -83,17 +87,19 @@ void Diretorio::inserts(int k)
     string chave = Hashing(k);
     int indice = identificaBits(chave);
 
-    if( !registros[indice].addKey(chave) )
+    if( !registros[indice]->addKey(chave))
     {
-        if( this->profGlobal == registros[indice].getProfLocal())
+ 
+        if( this->profGlobal == registros[indice]->getProfLocal())
         {
             //duplicate();
         }
-        else if( this->profGlobal > registros[indice].getProfLocal())
+        else if( this->profGlobal > registros[indice]->getProfLocal())
         {
             //split();
         }
     }
+    
 }
 
 void Diretorio::split(Balde chave)
