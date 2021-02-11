@@ -14,67 +14,104 @@ Diretorio::Diretorio(int numBits, int sizeBalde)
     this->numBits = numBits;
     this->sizeBalde = sizeBalde;
 
-    Balde *ind = new Balde(sizeBalde,0);
+    Balde *primeiroBalde = new Balde(sizeBalde, 0);
 
-    for( int i=0 ; i < 2 ; i++)
+    for (int i = 0; i < 2; i++)
     {
-        this->registros.push_back(ind);
+        this->registros.push_back(primeiroBalde);
     }
-
-} 
+}
 
 Diretorio::~Diretorio()
-{}
+{
+}
 
 void Diretorio::addProfGlobal()
 {
     this->profGlobal++;
 }
 
-vector<Balde*>Diretorio::getRegistros(){
+vector<Balde *> Diretorio::getRegistros()
+{
     return this->registros;
 }
 
-int Diretorio::identificaBits(string chave)
+int Diretorio::identificaBits(string chave, int profLocal)
 {
     vector<char> indiceDiretorio;
     int indice = 0;
     int j = 0;
 
-    for(int i=0; i < this->numBits ; i++)
+    for (int i = 0; i < profLocal; i++)
     {
         indiceDiretorio.push_back(chave[i]);
     }
 
-    for(int i=indiceDiretorio.size()-1; i >=0 ; i--)
+    for (int i = indiceDiretorio.size() - 1; i >= 0; i--)
     {
-        if(indiceDiretorio[i] == '1')
+        if (indiceDiretorio[i] == '1')
         {
-            indice += pow(2,j);
+            indice += pow(2, j);
         }
         j++;
     }
     indiceDiretorio.clear();
     return indice;
+}
 
+void Diretorio::identificaBalde(string pseudoChave, int profLocal, int *indSuperior, int *indInferior)
+{
+    vector<char> indiceDiretorio;
+    int profundidadeGlobal = this->profGlobal - 1;
+
+    for (int i = 0; i < profLocal; i++)
+    {
+        indiceDiretorio.push_back(pseudoChave[i]);
+    }
+    
+    for (int i = 0 ; i < profLocal ; i++)
+    {
+        if (this->profGlobal == profLocal)
+        {
+            *indSuperior += pow(2, profundidadeGlobal);
+            *indSuperior = *indInferior;
+        }
+        else
+        {
+            if( indiceDiretorio[i] == '1')
+            {
+                *indSuperior += pow(2, profundidadeGlobal);
+            }
+            else
+            {
+                *indInferior += pow(2, profundidadeGlobal);
+            }
+        }
+        profundidadeGlobal--;
+    }
 }
 
 string Diretorio::Hashing(int k)
 {
-    float knuth = (sqrt(5) - 1) / 2;                      // Sugestão Knuth[1971]
-    float parte_fracionaria = (k * knuth) - floor(k * knuth); // kA mod 1
-    string pseudochave = bitset<16>(floor(200 * parte_fracionaria)).to_string();
-    return pseudochave.substr(10,pseudochave.length());
+    string pseudoChave;
+    char c;
+    for (int i = 0; i < this->numBits; i++)
+    {
+        c = (k % 2) + '0';
+        pseudoChave.push_back(c);
+        k = k / 2;
+    }
+    return pseudoChave;
 }
 
 bool Diretorio::search(int k)
 {
     string chave = Hashing(k);
-    int indice = identificaBits(chave);
+    int indice = identificaBits(chave, registros[indice]->getProfLocal());
 
-    for(int i=0; i < registros[indice]->getPseudoChave().size() ; i++)
+    for (int i = 0; i < registros[indice]->getPseudoChave().size(); i++)
     {
-        if(chave == registros[indice]->getPseudoChave()[i])
+        if (chave == registros[indice]->getPseudoChave()[i])
         {
             return true;
         }
@@ -85,29 +122,80 @@ bool Diretorio::search(int k)
 void Diretorio::inserts(int k)
 {
     string chave = Hashing(k);
-    int indice = identificaBits(chave);
+    cout << "k = " << k << " " << chave << endl;
+    int indice = identificaBits(chave, registros[indice]->getProfLocal());
 
-    if( !registros[indice]->addKey(chave))
+    if (!registros[indice]->addKey(chave))
     {
- 
-        if( this->profGlobal == registros[indice]->getProfLocal())
+        if (this->profGlobal == registros[indice]->getProfLocal())
         {
-            //duplicate();
+            registros[indice]->addProfLocal();
+            duplicate(*registros[indice], indice, registros[indice]->getProfLocal(), chave);
         }
-        else if( this->profGlobal > registros[indice]->getProfLocal())
+        else if (this->profGlobal > registros[indice]->getProfLocal())
         {
-            //split();
+
+            registros[indice]->addProfLocal();
+            split(*registros[indice], indice, chave);
+        }
+    }
+}
+
+void Diretorio::split(Balde balde, int indice, string pseudochave)
+{
+    Balde *atual = new Balde(sizeBalde, balde.getProfLocal());
+    Balde *novo = new Balde(sizeBalde, balde.getProfLocal());
+    int ind = 0;
+    int indSuperior;
+    int indInferior;
+
+    for (int i = 0; i < balde.getPseudoChave().size(); i++)
+    {
+        ind = identificaBits(balde.getPseudoChave()[i], registros[indice]->getProfLocal());
+        if (ind == indice)
+        {
+            atual->addKey(balde.getPseudoChave()[i]);
+        }
+        else
+        {
+            novo->addKey(balde.getPseudoChave()[i]);
         }
     }
     
+    ind = identificaBits(pseudochave, registros[indice]->getProfLocal());
+    if (ind == indice)
+    {
+        atual->addKey(pseudochave);
+    }
+    else
+    {
+        novo->addKey(pseudochave);
+    }
+
+    ind = identificaBits(atual->getPseudoChave()[0], atual->getProfLocal());
+    registros[ind] = atual;
+
+    ind = identificaBits(novo->getPseudoChave()[0], novo->getProfLocal());
+    registros[ind] = novo;
+
+
 }
 
-void Diretorio::split(Balde chave)
+void Diretorio::duplicate(Balde balde, int indice, int profLocal, string pseudoChave)
 {
+    Balde *antigoBalde = new Balde(sizeBalde, profLocal);
+    Balde *novoBalde = new Balde(sizeBalde, profLocal);
+    
+    int indInferior = 0;
+    int indSuperior = 0;
+    for(int i = 0 ; i < pow(2,this->profGlobal); i++)
+    {
+        this->registros.push_back(novoBalde);
+    }
+    
+    this->profGlobal++;
 
-}
+    //split(balde,indice,pseudoChave);
 
-void Diretorio::duplicate()
-{
 
 }

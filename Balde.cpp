@@ -35,8 +35,8 @@ bool Balde::addKey(string chave)
     if(this->pseudoChave.size() < this->sizeBalde)
     {
         this->pseudoChave.push_back(chave);
+        //cout << "Chave : " << chave << " inserida com sucesso" << endl;
         return true;
     }
-    addProfLocal();
     return false;
 }
