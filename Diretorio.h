@@ -19,10 +19,9 @@ class Diretorio
     ~Diretorio();
 
 
-    void addProfGlobal();
 
     vector<Balde*>getRegistros();
-
+    int getProfGlobal();
 
     int identificaBits(string chave, int profLocal);
     void identificaBalde(string pseudoChave, int profLocal, int *indSuperior, int *indInferior);
@@ -30,7 +29,7 @@ class Diretorio
     string Hashing(int k);
 
     bool search(int k);
-    void inserts(int k);
+    void inserts(string pseudoChave);
     
     void split(Balde balde, int indice, string pseudoChave);
     void duplicate(Balde balde, int indice, int profLocal, string pseudoChave);

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdlib>
+#include <math.h>
 #include "Balde.h"
 #include "Diretorio.h"
 
@@ -9,16 +11,27 @@ using namespace std;
 
 int main()
 {
-    Diretorio *teste = new Diretorio(8,2);
+    Diretorio *teste = new Diretorio(5,5);
     //cout << teste->getRegistros().size() << endl;
     //teste->Hashing(2);
-    teste->inserts(0);
-    teste->inserts(7);
-    teste->inserts(250);
-    teste->inserts(1);
-    teste->inserts(12);
+    string cont = "1";
+    string chave;
+    
+    for(int i = 1; i <= 21; i++)
+    {
+        //srand(i) ;
+        //teste->inserts(rand() % 59);
+        
+        chave = teste->Hashing(i+2);
+        //chave = cont + chave;
+        //cout << "i : " << i << endl << endl;
+        teste->inserts(chave);
+    }
+
+    cout << "Profundidade Global : " << teste->getProfGlobal() << endl << endl;
     for(int i = 0 ; i < teste->getRegistros().size() ; i++)
     {
+
         cout << "Balde : " << i << " Profundidade Local : " << teste->getRegistros()[i]->getProfLocal() << endl;
         for(int j = 0; j < teste->getRegistros()[i]->getPseudoChave().size() ; j++)
         {
@@ -26,8 +39,6 @@ int main()
         }
     }
 
-
-    
     
     //cout << teste->search(0) << endl;
     return 0;
