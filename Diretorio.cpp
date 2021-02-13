@@ -59,58 +59,42 @@ int Diretorio::identificaBits(string chave, int profLocal)
     return indice;
 }
 
-void Diretorio::identificaBalde(string pseudoChave, int profLocal, int *indSuperior, int *indInferior)
+void Diretorio::identificaBalde(Balde balde, int profLocal, int *indSuperior, int *indInferior)
 {
     vector<char> indiceDiretorio;
     int profundidadeGlobal = this->profGlobal - 1;
     *indSuperior = *indInferior = 0;
+    int indRetornado = 0;
+    int indMaximo = indRetornado;
+    int indMin = 0;
+    int flag = 0;
+
+    if (this->profGlobal == balde.getProfLocal())
+    {
+        *indSuperior = *indInferior = identificaBits(balde.getPseudoChave()[0], balde.getProfLocal());
+        return;
+    }
     for (int i = 0; i < profLocal; i++)
     {
-        indiceDiretorio.push_back(pseudoChave[i]);
+        indiceDiretorio.push_back(balde.getPseudoChave()[i][i]);
     }
 
-    for (int i = 0; i < profLocal; i++)
+    for (int i = 0; i < indiceDiretorio.size() ; i++)
     {
-        if (this->profGlobal == profLocal)
+        if (indiceDiretorio[i] == '1')
         {
-            *indSuperior += pow(2, profundidadeGlobal);
-            *indInferior = *indSuperior;
-        }
-        else if (indiceDiretorio[i] == '1')
-        {
-            *indSuperior += pow(2, profundidadeGlobal);
-        }
-        else
-        {
-            *indInferior += pow(2, profundidadeGlobal);
+            indMin += pow(2, profundidadeGlobal);
         }
         profundidadeGlobal--;
     }
+
+    *indInferior = indMin;
+    *indSuperior = indMin +1 ;
+
+
+
     indiceDiretorio.clear();
 }
-/*for (int i = 0 ; i < profLocal ; i++)
-    {
-        if (this->profGlobal == profLocal)
-        {
-            cout << "SASKPAOSOPAKOS" << endl;
-            *indSuperior += pow(2, profundidadeGlobal);
-            *indSuperior = *indInferior;
-        }
-        else
-        {
-            cout << indiceDiretorio[i] << endl;
-            if( indiceDiretorio[i] == '1')
-            {
-                *indSuperior += pow(2, profundidadeGlobal);
-            }
-            else
-            {
-                *indInferior += pow(2, profundidadeGlobal);
-            }
-        }
-        profundidadeGlobal--;
-    }*/
-//cout << "indInferior : " << *indInferior << " indSuperior : " << *indSuperior << endl;
 
 string Diretorio::Hashing(int k)
 {
@@ -204,31 +188,6 @@ void Diretorio::split(Balde balde, int indice, string pseudoChave)
         novo->addKey(pseudoChave);
     }
 
-    /*for (int i = 0; i < balde.getPseudoChave().size(); i++)
-    {
-        ind = identificaBits(balde.getPseudoChave()[i], registros[indice]->getProfLocal());
-
-        if (ind == indice)
-        {
-            atual->addKey(balde.getPseudoChave()[i]);
-        }
-        else
-        {
-            novo->addKey(balde.getPseudoChave()[i]);
-        }
-    }
-    
-    ind = identificaBits(pseudochave, registros[indice]->getProfLocal());
-
-    if (ind == indice )
-    {
-        atual->addKey(pseudochave);
-    }
-    else
-    {
-        novo->addKey(pseudochave);
-    }
-/*/
     ind = identificaBits(atual->getPseudoChave()[0], atual->getProfLocal());
     registros[ind] = atual;
 
@@ -238,26 +197,20 @@ void Diretorio::split(Balde balde, int indice, string pseudoChave)
 
 void Diretorio::duplicate(Balde balde, int indice, int profLocal, string pseudoChave)
 {
+    vector<Balde *> diretorio ;
+
     Balde *atual = new Balde(sizeBalde, profLocal);
     Balde *novo = new Balde(sizeBalde, profLocal);
+    Balde *vazio = new Balde(sizeBalde, profLocal);
 
     int ind = 0;
     int indInferior = 0;
     int indSuperior = 0;
 
-    for (int i = 0; i < registros.size(); i++)
+    for(int i = 0 ; i < registros.size()*2 ; i++)
     {
-        cout << "Balde : " << i << " Profundidade Local : " << registros[i]->getProfLocal() << endl;
-        for (int j = 0; j < registros[i]->getPseudoChave().size(); j++)
-        {
-            cout << registros[i]->getPseudoChave()[j] << endl;
-        }
+        diretorio.push_back(vazio);
     }
-
-    cout << endl
-         << endl
-         << endl
-         << endl;
 
     for (int i = 0; i < pow(2, this->profGlobal); i++)
     {
@@ -281,12 +234,7 @@ void Diretorio::duplicate(Balde balde, int indice, int profLocal, string pseudoC
             novo->addKey(balde.getPseudoChave()[i]);
         }
     }
-
-    identificaBalde(pseudoChave, profLocal, &indSuperior, &indInferior);
     ind = identificaBits(pseudoChave, registros[indice]->getProfLocal());
-
-    //    cout << "ind : " << ind << " indInferior : " << indInferior << " indSuperior : " << indSuperior << endl;
-    //    cout << atual->getPseudoChave().size() <<  endl;
 
     if (ind == identificaBits(atual->getPseudoChave()[0], atual->getProfLocal()) && sizeBalde > atual->getPseudoChave().size())
     {
@@ -296,106 +244,28 @@ void Diretorio::duplicate(Balde balde, int indice, int profLocal, string pseudoC
     {
         novo->addKey(pseudoChave);
     }
-    Balde *aux;
-    cout << "ME DA OQ EU QUERO " << identificaBits(registros[0]->getPseudoChave()[1], registros[1]->getProfLocal()) << endl;
 
-    for (int i = 0; i < registros.size(); i++)
+    for (int i = 0; i < sqrt(registros.size()) ; i++)
     {
 
-        cout << "Balde : " << i << " Profundidade Local : " << registros[i]->getProfLocal() << endl;
-        for (int j = 0; j < registros[i]->getPseudoChave().size(); j++)
+        identificaBalde(*registros[i], registros[i]->getProfLocal(), &indSuperior, &indInferior);
+        if (indSuperior == indInferior)
         {
-            cout << registros[i]->getPseudoChave()[j] << endl;
+            diretorio[indSuperior] = registros[i];
         }
-    }
-    cout << "Balde Atual" << endl;
-    for (int i = 0; i < atual->getPseudoChave().size(); i++)
-    {
-
-        cout << atual->getPseudoChave()[i] << endl;
-    }
-    cout << "Balde Novo" << endl;
-    for (int i = 0; i < novo->getPseudoChave().size(); i++)
-    {
-        cout << novo->getPseudoChave()[i] << endl;
-    }
-
-    cout << endl
-         << endl
-         << endl
-         << endl;
-
-    for (int i = 0; i < pow(2, this->profGlobal); i++)
-    {
-        for (int j = 0; j < registros[i]->getPseudoChave().size(); j++)
+        else
         {
-            //cout << "pseudoChave " << registros[i]->getPseudoChave()[j] << "  " << registros[i]->getProfLocal() << endl;
-            identificaBalde(registros[i]->getPseudoChave()[j], registros[i]->getProfLocal(), &indSuperior, &indInferior);
-
-            ind = identificaBits(registros[i]->getPseudoChave()[j], registros[i]->getProfLocal());
-            //cout << "ind : " << ind << " indInferior : " << indInferior << " indSuperior : " << indSuperior << endl;
-            while (indInferior > indSuperior)
+            while (indInferior <= indSuperior)
             {
-                registros[indInferior - 1] = registros[i];
-                indInferior--;
+                diretorio[indInferior] = registros[i];
+                indInferior++;
             }
-
-            //cout << "ind : " << ind << " indInferior : " << indInferior << " indSuperior : " << indSuperior << endl;
         }
-
-        //cout << endl << endl << endl;
     }
+    diretorio[identificaBits(atual->getPseudoChave()[0], atual->getProfLocal())] = atual;
 
-    //cout << "Atual size : " << atual->getPseudoChave().size() << endl;
-    //cout << "Novo size : " << novo->getPseudoChave().size() << endl << endl;
+    diretorio[identificaBits(novo->getPseudoChave()[0], novo->getProfLocal())] = novo;
 
-    for (int i = 0; i < atual->getPseudoChave().size(); i++)
-    {
+    registros = diretorio;
 
-        ind = identificaBits(atual->getPseudoChave()[i], atual->getProfLocal());
-        registros[ind] = atual;
-        //cout << ind << endl;
-    }
-
-    for (int i = 0; i < novo->getPseudoChave().size(); i++)
-    {
-        ind = identificaBits(novo->getPseudoChave()[i], novo->getProfLocal());
-        registros[ind] = novo;
-        //cout << "B" << ind << endl;
-    }
-    /*
-    ind = identificaBits(atual->getPseudoChave()[0], atual->getProfLocal());
-    identificaBalde(atual->getPseudoChave()[0], novo->getProfLocal(), &indSuperior, &indInferior);
-    cout << "ind : " << ind << " indInferior : " << indInferior << " indSuperior : " << indSuperior << endl;
-    ind = identificaBits(atual->getPseudoChave()[1], atual->getProfLocal());
-    cout << ind << endl << endl << endl;
-
-
-    cout << "IND ATUAL AQUI : " << ind << endl ;
-    registros[ind] = atual;
-
-
-    ind = identificaBits(novo->getPseudoChave()[0], novo->getProfLocal());
-
-    cout << "IND NOVO AQUI : " << ind << endl ;
-
-    registros[ind] = novo;
-*/
-
-    //cout << "TESTE5 "<< endl << endl;
-
-    /*for( int j = indInferior ; j <= indSuperior ; j++)
-    {
-        cout << "Atual indice " << indInferior << " " << indSuperior << endl;
-        registros[j] = atual;
-    }
-
-    identificaBalde(novo->getPseudoChave()[0], novo->getProfLocal(), &indSuperior, &indInferior);
-    for( int j = indInferior ; j <= indSuperior ; j++)
-    {
-        cout << "Novo indice " << indInferior << " " << indSuperior << endl;
-        registros[j] = novo;
-    }
-*/
-    cout << "FINALZOU FUNCAO DUPLICATE" << endl << endl;
 }

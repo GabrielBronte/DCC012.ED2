@@ -24,7 +24,7 @@ class Diretorio
     int getProfGlobal();
 
     int identificaBits(string chave, int profLocal);
-    void identificaBalde(string pseudoChave, int profLocal, int *indSuperior, int *indInferior);
+    void identificaBalde(Balde balde, int profLocal, int *indSuperior, int *indInferior);
 
     string Hashing(int k);
 
