@@ -25,8 +25,9 @@ class Diretorio
 
     int identificaBits(string chave, int profLocal);
     void identificaBalde(Balde balde, int profLocal, int *indSuperior, int *indInferior);
+    
 
-    string Hashing(int k);
+    string intToString(int k);
 
     bool search(int k);
     void inserts(string pseudoChave);

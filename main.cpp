@@ -9,39 +9,79 @@
 
 using namespace std;
 
-int main()
+void printfDiretorio(Diretorio *diretorio)
 {
-    Diretorio *teste = new Diretorio(6,5);
-    //cout << teste->getRegistros().size() << endl;
-    //teste->Hashing(2);
-    char cont = '1';
-    string chave;
-    
-    for(int i = 1; i <= 40; i++)
+    cout << "Profundidade Global : " << diretorio->getProfGlobal() << endl << endl;
+    for(int i = 0 ; i < diretorio->getRegistros().size() ; i++)
     {
-        //srand(i) ;
-        //teste->inserts(rand() % 59);
-        
-        chave = teste->Hashing(i+2);
-        //chave[0] = cont;
-        cout << chave << endl;
-        //chave = cont + chave;
-        //cout << "i : " << i << endl << endl;
-        teste->inserts(chave);
-    }
-
-    cout << "Profundidade Global : " << teste->getProfGlobal() << endl << endl;
-    for(int i = 0 ; i < teste->getRegistros().size() ; i++)
-    {
-
-        cout << "Balde : " << i << " Profundidade Local : " << teste->getRegistros()[i]->getProfLocal() << endl;
-        for(int j = 0; j < teste->getRegistros()[i]->getPseudoChave().size() ; j++)
+        cout << "Balde : " << i << " Profundidade Local : " << diretorio->getRegistros()[i]->getProfLocal() << endl;
+        for(int j = 0; j < diretorio->getRegistros()[i]->getPseudoChave().size() ; j++)
         {
-            cout << teste->getRegistros()[i]->getPseudoChave()[j] << endl;
+            cout << diretorio->getRegistros()[i]->getPseudoChave()[j] << endl;
         }
     }
+}
+
+void menu(int bits, int sizeBaldes)
+{
+    int seleciona;
+    do
+    {
+        cout << "MENU" << endl << endl;
+        cout << "[1] Insercoes de 20 pseudo-chaves aleatorias" << endl;
+        cout << "[2] Insercoes de 20 pseudo-chaves iniciadas com o bit 0" << endl;
+        cout << "[0] Sair" << endl;
+
+        cin >> seleciona ;
+
+        if( ! seleciona )
+        {
+            break;
+        }
+        else if ( seleciona == 1)
+        {
+            Diretorio *diretorio = new Diretorio(bits,sizeBaldes);
+            for(int i = 1; i <= 20; i++)
+            {
+                srand(time(0));
+                diretorio->inserts( diretorio->intToString(rand() % 100 + i) ) ;
+            }
+            printfDiretorio(diretorio);
+            delete diretorio;
+        }
+        else
+        {
+            Diretorio *diretorio = new Diretorio(bits,sizeBaldes);
+            for(int i = 1; i <= 20; i++)
+            {
+                string chave;
+                char primeiroBit = '1';
+
+                srand(time(0));
+                chave = diretorio->intToString(rand() % 100 + i);
+                chave [0] = primeiroBit;
+                diretorio->inserts( chave ) ;
+            }
+            printfDiretorio(diretorio);
+
+            delete diretorio;
+        }
+        cout << endl << endl << endl;
+    } while (seleciona != 0);
+}
+
+int main()
+{
+    int bits, sizeBaldes;
 
     
-    //cout << teste->search(0) << endl;
+    cout << "Digite o tamanho dos baldes : " ;
+    cin >> sizeBaldes;
+    cout << "Digite o numero de bits : ";
+    cin >> bits;
+    cout << endl;
+
+    menu(bits, sizeBaldes);
+
     return 0;
 }

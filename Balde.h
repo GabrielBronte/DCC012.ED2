@@ -20,7 +20,7 @@ class Balde
     int getProfLocal();
     bool addKey(string chave);    
     void addProfLocal();
-
+    void setProfLocal();
 
 
 
