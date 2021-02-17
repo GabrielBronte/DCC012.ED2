@@ -9,8 +9,9 @@
 
 using namespace std;
 
+
 void printfDiretorio(Diretorio *diretorio)
-{
+{   
     cout << "Profundidade Global : " << diretorio->getProfGlobal() << endl << endl;
     for(int i = 0 ; i < diretorio->getRegistros().size() ; i++)
     {
@@ -43,8 +44,11 @@ void menu(int bits, int sizeBaldes)
             Diretorio *diretorio = new Diretorio(bits,sizeBaldes);
             for(int i = 1; i <= 20; i++)
             {
+                string chave;
                 srand(time(0));
-                diretorio->inserts( diretorio->intToString(rand() % 100 + i) ) ;
+                chave = diretorio->intToString(rand() % 100 + i);
+
+                diretorio->inserts( chave ) ;
             }
             printfDiretorio(diretorio);
             delete diretorio;
@@ -55,16 +59,20 @@ void menu(int bits, int sizeBaldes)
             for(int i = 1; i <= 20; i++)
             {
                 string chave;
-                char primeiroBit = '1';
+
+                char primeiroBit = '0';
 
                 srand(time(0));
-                chave = diretorio->intToString(rand() % 100 + i);
+                chave = diretorio->intToString(rand() % 59 + i);
                 chave [0] = primeiroBit;
+
                 diretorio->inserts( chave ) ;
             }
+
             printfDiretorio(diretorio);
 
             delete diretorio;
+
         }
         cout << endl << endl << endl;
     } while (seleciona != 0);
@@ -74,13 +82,12 @@ int main()
 {
     int bits, sizeBaldes;
 
-    
     cout << "Digite o tamanho dos baldes : " ;
     cin >> sizeBaldes;
     cout << "Digite o numero de bits : ";
     cin >> bits;
     cout << endl;
-
+    
     menu(bits, sizeBaldes);
 
     return 0;

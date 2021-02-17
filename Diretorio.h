@@ -29,10 +29,10 @@ class Diretorio
 
     string intToString(int k);
 
-    bool search(int k);
+    bool search(string chave);
     void inserts(string pseudoChave);
     
     void split(Balde balde, int indice, string pseudoChave);
-    void duplicate(Balde balde, int indice, int profLocal, string pseudoChave);
+    void duplicate(Balde balde, int profLocal, string pseudoChave);
 
 };
